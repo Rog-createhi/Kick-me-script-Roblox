@@ -1,0 +1,38 @@
+local frame = script.Parent
+local player = game.Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+local dragging, dragStart, startPos
+
+local function updateInput(input)
+	if dragging then
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end
+
+frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+userInputService.InputChanged:Connect(updateInput)
+
+-- Kick Button Functionality
+frame.TextButton.MouseButton1Click:Connect(function()
+	player:Kick("You have been kicked from the game.")
+end)
+
+-- Rejoin Button Functionality
+frame:WaitForChild("RejoinButton").MouseButton1Click:Connect(function()
+	-- This line will rejoin the game
+	game:GetService("TeleportService"):Teleport(game.PlaceId, player)
+end)
